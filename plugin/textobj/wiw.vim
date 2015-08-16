@@ -45,21 +45,39 @@ let s:prefix = get(g:, 'textobj_wiw_default_key_mappings_prefix', ',')
 " Key-mappings
 call textobj#user#plugin('wiw', {
       \ '-': {
-      \   '*pattern*': 'DUMMY',
       \   'move-n'   : s:prefix . 'w',
+      \   'move-n-function': 's:move_n',
       \   'move-p'   : s:prefix . 'b',
+      \   'move-p-function': 's:move_p',
       \   'move-N'   : s:prefix . 'e',
+      \   'move-N-function': 's:move_N',
       \   'move-P'   : s:prefix . 'ge',
+      \   'move-P-function': 's:move_P',
       \
-      \   '*sfile*'  : expand('<sfile>:p'),
-      \   'select-a' : 'a' . s:prefix . 'w', '*select-a-function*': 's:select_a',
-      \   'select-i' : 'i' . s:prefix . 'w', '*select-i-function*': 's:select_i',
+      \   'sfile'  : expand('<sfile>'),
+      \
+      \   'select-a' : 'a' . s:prefix . 'w',
+      \   'select-a-function': 's:select_a',
+      \   'select-i' : 'i' . s:prefix . 'w',
+      \   'select-i-function': 's:select_i',
       \ }
       \})
 unlet s:prefix
 
-let s:WIW_HEAD = '\%(\(\<.\)\|\(\u\l\|\l\@<=\u\)\|\(\A\@<=\a\)\)'
-let s:WIW_TAIL = '\%(\(.\>\)\|\(\l\u\@=\|\u\%(\u\l\)\@=\)\|\(\a\A\@=\)\)'
+let s:WIW_HEAD =
+      \ '\%('
+      \.    '\(\<.\)'
+      \. '\|'
+      \.    '\('
+      \.       '\u\l'
+      \.    '\|'
+      \.       '\l\@<=\u'
+      \.    '\)'
+      \. '\|'
+      \.    '\('
+      \.       '\A\@<=\a'
+      \.    '\)'
+      \. '\)'
 
 " Sub-match types
 let s:NOT_FOUND  = 0
@@ -78,16 +96,20 @@ let s:CTYPE_BOUND = 4
 " sub-matches matched but the whole pattern did match. See :help
 " search()-sub-match.
 
+function! s:move_n()
+
+endfunction
+
 
 " Override move function to share s:move() with s:select().
-function! g:__textobj_wiw.move(obj_name, flags, previous_mode)
-  if a:previous_mode ==# 'v'
-    normal! gv
-  endif
-  let pattern = (a:flags =~# 'e' ? s:WIW_TAIL : s:WIW_HEAD)
-  let flags   = (a:flags =~# 'b' ? 'b' : '')
-  call s:move(pattern, flags, v:count1, 0)
-endfunction
+" function! g:__textobj_wiw.move(obj_name, flags, previous_mode)
+"   if a:previous_mode ==# 'v'
+"     normal! gv
+"   endif
+"   let pattern = (a:flags =~# 'e' ? s:WIW_TAIL : s:WIW_HEAD)
+"   let flags   = (a:flags =~# 'b' ? 'b' : '')
+"   call s:move(pattern, flags, v:count1, 0)
+" endfunction
 
 function! s:move(pattern, flags, count, within_word)
   let flags = a:flags
